@@ -104,7 +104,7 @@ def convert_to_model(val):
 
 def match_model_to_data(model, data):
     assert isinstance(model, Model), "model must be of type Model!"
-    
+
     try:
         if isinstance(data, DenseDataWithIndex):
             out_val = model.f(data.convert_to_df())
@@ -119,7 +119,7 @@ def match_model_to_data(model, data):
             model.out_names = ["output value"]
         else:
             model.out_names = ["output value "+str(i) for i in range(out_val.shape[0])]
-    
+
     return out_val
 
 
@@ -235,6 +235,19 @@ class LogitLink(Link):
         return 1/(1+np.exp(-x))
 
 
+class LogLink(Link):
+    def __str__(self):
+        return "log"
+
+    @staticmethod
+    def f(x):
+        return np.log(x)
+
+    @staticmethod
+    def finv(x):
+        return np.exp(x)
+
+
 def convert_to_link(val):
     if isinstance(val, Link):
         return val
@@ -242,5 +255,7 @@ def convert_to_link(val):
         return IdentityLink()
     elif val == "logit":
         return LogitLink()
+    elif val == "log":
+        return LogLink()
     else:
         assert False, "Passed link object must be a subclass of iml.Link"
